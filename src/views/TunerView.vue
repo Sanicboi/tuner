@@ -8,10 +8,13 @@
 <script setup lang="ts">
 import { onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 import { createTuner } from '@chordbook/tuner'
+import { onBeforeRouteLeave } from 'vue-router';
 
 
 let note = ref('');
 let acc = ref('');
+
+let stream: MediaStream | null = null;
 
 let tuner: {
     start: () => Promise<void>;
@@ -23,6 +26,7 @@ onMounted(async () => {
     const media = await navigator.mediaDevices.getUserMedia({
         audio: true
     });
+    stream = media;
     tuner = createTuner({
         onNote: (n) => {
             console.log(n);
@@ -59,6 +63,13 @@ onMounted(async () => {
     })
     await tuner.start();
 
+})
+
+
+onBeforeRouteLeave(async () => {
+
+    await tuner!.stop();
+    stream?.getAudioTracks().forEach(el => el.stop())
 })
 
 

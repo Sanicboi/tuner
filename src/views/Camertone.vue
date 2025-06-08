@@ -3,17 +3,17 @@
     <button @click="play" class="self-center p-4 bg-neutral-300 mt-8 rounded-lg">Play sound</button>
 </template>
 <script setup lang="ts">
+import { onBeforeRouteLeave } from 'vue-router';
 
-const ctx = new window.AudioContext();
-const play = () => {
-    const oscillator = ctx.createOscillator();
-    oscillator.type = 'square';
-    oscillator.frequency.value = 440;
-    oscillator.connect(ctx.destination);
-    oscillator.start();
-    setTimeout(() => {
-        oscillator.stop()
-    }, 1000);
+
+let aud: HTMLAudioElement | null = null;
+const play = async () => {
+    aud = new Audio('/audio.mp3');
+    await aud.play();
 }
+
+onBeforeRouteLeave(async () => {
+    await aud?.pause();
+})
 </script>
 <style scoped></style>
